@@ -1,0 +1,10 @@
+panel,plab,ylab,plot,legpos,ymin,ymax
+A,Sleep preparation,1-Not at all; 5=Very much,EV,topleft,1,5
+B,Resting & Sleeping,1-Not at all; 5=Very much,EV,topleft,1,5
+C,Care seeking,1-Not at all; 5=Very much,EV,topleft,1,5
+D,Physical activities,1-Not at all; 5=Very much,EV,topleft,1,5
+E,Social activities,1-Not at all; 5=Very much,EV,topleft,1,5
+F,Hunger & Thirst,1-Not at all; 5=Very/very much,EV,topleft,1,5
+G,Food preferences,1-Not at all; 5=Very much,EV,topleft,1,5
+H,Utilization of resources,Probability,binary,topleft,0,1
+I,Sleepiness,Frequency,hist,topleft,NA,NA

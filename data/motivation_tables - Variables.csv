@@ -1,0 +1,25 @@
+var,label,panel
+MOS_1,Hungry,F
+MOS_2,Rest,B
+MOS_3,Sleep own bed,B
+MOS_4,Sleep any bed,B
+MOS_5,Walk,D
+MOS_6,Exercise,D
+MOS_7,Be home,A
+MOS_8,Be alone,E
+MOS_9,Be with friends,E
+MOS_10,Be with stranger,E
+MOS_11,Date,E
+MOS_12,Water,F
+MOS_13,Food shopping,D
+MOS_14,Meal,F
+MOS_15,Fruit,G
+MOS_16,Sweets/candy,G
+MOS_17,Steak/protein,G
+MOS_18,Shut eyes,A
+MOS_19,Partner,C
+MOS_20,Parent,C
+MOS_21,Quiet,A
+MOS_22,Pay,H
+MOS_23,Walk,H
+MOS_24,Sleepiness,I
