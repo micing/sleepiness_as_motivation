@@ -1,21 +1,25 @@
 library("MASS")
 library("lmtest")
+library("tidyverse")
+library("readxl")
 
-#### Read data and correct errors ####
+#### Read data, correct errors and anonymise ####
 
-# # anonymise data
-#data=read.csv("data/data_slesi_motivation.txt", sep="\t")
-#data = data[order(runif(dim(data)[1])), ]
-#data$id=seq(1,dim(data)[1])
-#write.csv(data, file="data/sleepiness_as_motivation.csv",  row.names=F)
-
-data=read.csv("data/sleepiness_as_motivation.csv")
-data$kss=data$MOS_24
-
-dv=names(data[!names(data) %in% c("id", "sd", "kss", "MOS_22_text", "MOS_23_text")])
-data[data$MOS_23 %in% c(6), "MOS_23"] <- NA # this is the freely rated category (see below)
-data[data$MOS_22_text %in% c("20", "24"), "MOS_23"] <- 6 # Note: MOS_22_text is actually MOS_23_text
-data[data$MOS_19 %in% c(0), "MOS_19"] <- NA # remove respondents with no partner
+# d=read_excel("data/MOS_clean-2.xlsx") %>%
+#   left_join(read_excel("data/SD gender age MOS.xlsx") %>% rename_all(tolower)) %>%
+#   rename(MOS_23_text = MOS_2_text) %>%
+#   mutate(
+#     MOS_23 = replace(MOS_23, MOS_23 == 6, NA), # this is the freely rated category (see below)
+#     MOS_23 = replace(MOS_23, MOS_23_text %in%c(20, 24), 6), # se above
+#     MOS_19 = replace(MOS_19, MOS_19 == 0, NA), # remove respondents with no partner
+#     kss = MOS_24,
+#     rand=rnorm(123)) %>%
+#     arrange(rand) %>%
+#     mutate(id=seq(1,123)) %>% select(id, sd, kss, starts_with("MOS"))
+# write_tsv(d, path="data/sleepiness_as_motivation.tsv")
+  
+data=read_tsv("data/sleepiness_as_motivation.tsv")
+dv=names(data[!names(data) %in% c("id", "sd", "kss", "MOS_23_text")])
 
 #### functions ####
 
@@ -65,12 +69,14 @@ for (v in dv) {
   d[[v]] <- factor(d[[v]] , ordered=TRUE)
 
   for (i in 1:length(method)) {
+    print(v)
     m=list()
     m$base = polr(paste0(v,"~ 1" ), data=d, Hess=TRUE, method=method[i])
-    m$kss = tryCatch({polr(paste0(v, "~ kss"), data=d, Hess=TRUE, method=method[i])},
-             error = function(e) NULL) # catch one error when kss (MOS_24) is both IV and DV
+    if (v != "MOS_24") { # don't fit when kss (MOS_24) is both IV and DV
+      m$kss = polr(paste0(v, "~ kss"), data=d, Hess=TRUE, method=method[i])
+      m$p$kss =lrtest(m$kss, m$base)$`Pr(>Chisq)`[[2]]
+    }
     m$sd = polr(paste0(v, "~ sd"), data=d, Hess=TRUE, method=method[i])
-    m$p$kss = tryCatch({lrtest(m$kss, m$base)$`Pr(>Chisq)`[[2]]},  error = function(e) NULL)
     m$p$sd = lrtest(m$sd, m$base)$`Pr(>Chisq)`[[2]]
     models[[v]][[method[i]]] = m
   }
@@ -84,6 +90,6 @@ save(models, file="data/sleepiness_as_motivation_models.RDta")
 kss_table = resultTable(models, dv, iv="kss", method="logistic")
 sd_table = resultTable(models, dv, iv="sd", method="logistic")
 
-write.csv(kss_table, "tables/kss_table.csv")
-write.csv(sd_table, "tables/sd_table.csv")
+write_tsv(kss_table, "tables/kss_table.tsv")
+write_tsv(sd_table, "tables/sd_table.tsv")
 
